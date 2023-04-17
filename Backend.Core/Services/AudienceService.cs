@@ -139,5 +139,20 @@ namespace Backend.Core.Services
             
             return res;
         }
+
+        public async Task<AudienceGetDTO> PostAudience(AudiencePostDTO audiencePostDTO)
+        {
+            Audience toAdd = new Audience()
+            {
+                Age = audiencePostDTO.Age,
+                Sex = audiencePostDTO.Sex
+            };
+            var add = await _context.Audience.AddAsync(toAdd);
+            await _context.SaveChangesAsync();
+            int[] id = { add.Entity.AudienceId };
+            var res = await GetAudience(id);
+            return res.FirstOrDefault();
+
+        }
     }
 }

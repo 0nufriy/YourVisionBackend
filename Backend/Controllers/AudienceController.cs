@@ -95,5 +95,18 @@ namespace Backend.Controllers
             }
             return Ok(res);
         }
+
+        [HttpPost]
+        [Route("Audience/post")]
+        public async Task<ActionResult<List<AudienceGetDTO>>> PostAudience(AudiencePostDTO audiencePostDTO)
+        {
+            AudienceGetDTO res = await service.PostAudience(audiencePostDTO);
+            if (res == null)
+            {
+                return NotFound();
+            }
+            return Ok(res);
+        }
+
     }
 }

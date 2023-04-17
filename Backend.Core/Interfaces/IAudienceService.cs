@@ -17,6 +17,7 @@ namespace Backend.Core.Interfaces
         
         Task<List<AudienceGetDTO>> GetAudience();
         Task<List<AudienceGetDTO>> GetAudience(int[] id);
+        Task<AudienceGetDTO> PostAudience(AudiencePostDTO audiencePostDTO);
 
     }
 }
