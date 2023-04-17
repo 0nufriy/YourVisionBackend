@@ -2,6 +2,7 @@
 using Backend.Core.Models;
 using Backend.Infrastructure.Models;
 using Backend.Model;
+using Backend.Metods;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -17,6 +18,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Runtime.Intrinsics.X86;
 using System.Security.Claims;
+
 
 namespace Backend.Controllers
 {
@@ -42,7 +44,7 @@ namespace Backend.Controllers
             {
                 return NotFound();
             }
-            var user = GetCurrentUser();
+            var user = CurrentUser.Get(HttpContext);
             if(user.Role != "admin" && user.ProfileId != res.UserId)
             {
                 return NotFound();
@@ -60,7 +62,7 @@ namespace Backend.Controllers
             {
                 return NotFound();
             }
-            var user = GetCurrentUser();
+            var user = CurrentUser.Get(HttpContext);
             if (user.Role != "admin" && user.ProfileId != res.UserId)
             {
                 return NotFound();
@@ -340,7 +342,7 @@ namespace Backend.Controllers
         [Route("get/user/{id}")]
         public async Task<ActionResult<SessionGetDTO>> GetSesionUser(int id)
         {
-            var user = GetCurrentUser();
+            var user = CurrentUser.Get(HttpContext);
             List<SessionGetDTO> list = await serviceSession.SessionGetByProfile(user.ProfileId);
             SessionGetDTO res = await serviceSession.SessionGetById(id);
             if (res == null)
@@ -359,7 +361,7 @@ namespace Backend.Controllers
         [Route("get/byProfile/")]
         public async Task<ActionResult<List<SessionGetDTO>>> SesionsGetbyProfile()
         {
-            var user = GetCurrentUser();
+            var user = CurrentUser.Get(HttpContext);
             List<SessionGetDTO> res = await serviceSession.SessionGetByProfile(user.ProfileId);
             if (res == null)
             {
@@ -373,7 +375,7 @@ namespace Backend.Controllers
         [Route("add")]
         public async Task<ActionResult<SessionGetDTO>> Post(SessionPost Post)
         {
-            var userFromJwt = GetCurrentUser();
+            var userFromJwt = CurrentUser.Get(HttpContext);
             SessionPostDTO DTO = new SessionPostDTO()
             {
                 Datetime = Post.Datetime,
@@ -478,23 +480,7 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
-        [NonAction]
-        private UserFromJWT? GetCurrentUser()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-
-            if (identity is not null)
-            {
-                var userClaims = identity.Claims;
-
-                return new UserFromJWT
-                {
-                    Login = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.GivenName)?.Value, 
-                    ProfileId = Convert.ToInt32(userClaims.FirstOrDefault( o => o.Type == ClaimTypes.Sid)?.Value),
-                    Role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role)?.Value
-                };
-            }
-            return null;
-        }
+       
+      
     }
 }

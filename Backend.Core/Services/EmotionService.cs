@@ -23,6 +23,15 @@ namespace Backend.Core.Services
         public async Task<EmotionalGetDTO> GetEmotionals(int sessionsId)
         {
             EmotionalGetDTO res = new EmotionalGetDTO();
+
+            
+            var session = _context.Session.FirstOrDefault(x => x.SessionId == sessionsId);
+            if(session == null)
+            {
+                return null;
+            }
+
+            res.ProfileId = session.ProfileId;
             res.EmotionalExpect =  _context.EmotionalExpect
                 .Include(x => x.Audience)
                 .Where(x => x.SessionId == sessionsId)

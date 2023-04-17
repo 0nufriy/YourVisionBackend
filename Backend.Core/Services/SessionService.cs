@@ -16,11 +16,16 @@ namespace Backend.Core.Services
 
         public async Task<ReportAllData> ReportAllData(int sessionId)
         {
+           
+
+            var sessionInfo = SessionGetById(sessionId).Result;
+            if (sessionInfo == null)
+            {
+                return null;
+            }
             ReportAllData res = new ReportAllData();
 
             res.SessionId = sessionId;
-
-            var sessionInfo = SessionGetById(sessionId).Result;
             res.Datetime = sessionInfo.Datetime;
             res.Status = sessionInfo.Status;
             res.DurationMinute = sessionInfo.DurationMinute;
@@ -75,7 +80,6 @@ namespace Backend.Core.Services
             await _context.Report.AddAsync(toAdd);
             try
             {
-               
                 await _context.SaveChangesAsync();
             }
             catch
@@ -135,6 +139,12 @@ namespace Backend.Core.Services
             SessionGetDTO? res = await _context.Session
                 .Select(x => new SessionGetDTO { Datetime = x.Datetime, DurationMinute = x.DurationMinute, ProfileId = x.ProfileId, SessionId = x.SessionId, Status = x.Status, Location = x.Location })
                 .FirstOrDefaultAsync(x => x.SessionId == id);
+
+            if(res == null)
+            {
+                return null;
+            }
+
             res.AudiencePacks = await _context.AudienceSession
                 .Where(x => x.SessionId == id)
                 .Select(x => new AudienceSessionDTO { AudiencePackCount = x.AudiencePackCount, AudiencePackId = x.AudiencePackId })
@@ -204,6 +214,10 @@ namespace Backend.Core.Services
             toAdd.Location = sessionPostDTO.Location;
             toAdd.AudienceSession = sessionPostDTO.Audiences.Select(x => new AudienceSession { AudiencePackCount= x.AudiencePackCount, AudiencePackId= x.AudiencePackId}).ToList();
             var add = await _context.Session.AddAsync(toAdd);
+            if(add == null)
+            {
+                return null;
+            }
             await _context.SaveChangesAsync();
             var res = await SessionGetById(add.Entity.SessionId);
             return res;

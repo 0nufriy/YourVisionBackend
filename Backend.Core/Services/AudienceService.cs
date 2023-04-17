@@ -86,6 +86,10 @@ namespace Backend.Core.Services
                 AAPs = postDTO.Audiences.Select(x => new AAP { AudienceCount = x.AudienceCount, AudienceId = x.AudienceId }).ToList()
             };
             var add = await _context.AudiencePack.AddAsync(toAdd) ;
+            if(add == null)
+            {
+                return null;
+            }
             await _context.SaveChangesAsync();
             var res = await GetAudiencePack(add.Entity.AudiencePackId);
             return res;
@@ -116,10 +120,6 @@ namespace Backend.Core.Services
         {
             var a =  _context.Audience.ToList();
             
-            if(a == null)
-            {
-                return null;
-            }
             List<AudienceGetDTO> res = new List<AudienceGetDTO>();
             foreach(var item in a)
             {

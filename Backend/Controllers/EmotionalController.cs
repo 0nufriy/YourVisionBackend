@@ -1,5 +1,6 @@
 ﻿using Backend.Core.Interfaces;
 using Backend.Core.Models;
+using Backend.Metods;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +22,13 @@ namespace Backend.Controllers
         [Route("getEmotional/{id}")]
         public async Task<ActionResult<EmotionalGetDTO>> EmotionalGet(int id)
         {
+           
             EmotionalGetDTO res = await service.GetEmotionals(id);
+            var user = CurrentUser.Get(HttpContext);
+            if (user.Role != "admin" && user.ProfileId != res.ProfileId)
+            {
+                return NotFound();
+            }
             if (res == null)
             {
                 return NotFound();

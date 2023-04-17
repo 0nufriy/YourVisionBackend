@@ -55,7 +55,16 @@ namespace Backend.Core.Services
             {
                 return null;
             }
-            await _context.SaveChangesAsync();
+            try
+            {
+
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                return null;
+            }
+
             var res = await Login(new ProfileLoginDTO { login = profilePostDTO.Login, password = profilePostDTO.password });
             if (res == null)
             {

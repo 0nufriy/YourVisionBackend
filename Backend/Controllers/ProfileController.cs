@@ -1,7 +1,9 @@
 ﻿using Backend.Core.Interfaces;
 using Backend.Core.Models;
+using Backend.Core.Metods;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Backend.Metods;
 
 namespace Backend.Controllers
 {
@@ -35,6 +37,11 @@ namespace Backend.Controllers
         [Route("get/{id}")]
         public async Task<ActionResult<ProfileGetDTO>> Get(int id)
         {
+            var user = CurrentUser.Get(HttpContext);
+            if (user.Role != "admin" && user.ProfileId != id)
+            {
+                return NotFound();
+            }
             ProfileGetDTO res = await service.GetProfile(id);
             if (res == null)
             {
@@ -47,6 +54,11 @@ namespace Backend.Controllers
         [Route("delete/{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
         {
+            var user = CurrentUser.Get(HttpContext);
+            if (user.Role != "admin" && user.ProfileId != id)
+            {
+                return NotFound();
+            }
             bool res = await service.ProfileDelete(id);
             if(res == false)
             {
@@ -59,6 +71,11 @@ namespace Backend.Controllers
         [Route("patch")]
         public async Task<ActionResult<ProfileGetDTO>> Patch(ProfilePatchDTO profilePatchDTO)
         {
+            var user = CurrentUser.Get(HttpContext);
+            if (user.Role != "admin" && user.ProfileId != profilePatchDTO.ProfileId)
+            {
+                return NotFound();
+            }
             ProfileGetDTO res = await service.ProfilePatch(profilePatchDTO);
             if (res == null)
             {
@@ -67,12 +84,14 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
-        [Authorize]
+        [Authorize(Roles = "user")]
         [HttpPatch]
         [Route("patch/password")]
-        public async Task<ActionResult<ProfileGetDTO>> PatchPassword(string login, string oldPassword, string newPassword)
+        public async Task<ActionResult<ProfileGetDTO>> PatchPassword( string oldPassword, string newPassword)
         {
-            ProfileGetDTO res = await service.ProfileChangePasswort(login, oldPassword, newPassword);
+            var user = CurrentUser.Get(HttpContext);
+            
+            ProfileGetDTO res = await service.ProfileChangePasswort(user.Login, oldPassword, newPassword);
             if (res == null)
             {
                 return NotFound();

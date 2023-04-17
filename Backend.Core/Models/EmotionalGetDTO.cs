@@ -8,6 +8,7 @@ namespace Backend.Core.Models
 {
     public class EmotionalGetDTO
     {
+        public int? ProfileId {  get; set; }
         public List<EmotionalRGetDTO>? EmotionalResult { get; set; }
         public List<EmotionalEGetDTO>? EmotionalExpect { get; set; }
     }
