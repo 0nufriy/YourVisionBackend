@@ -149,10 +149,55 @@ namespace Backend.Core.Services
             };
             var add = await _context.Audience.AddAsync(toAdd);
             await _context.SaveChangesAsync();
+            if (add == null)
+            {
+                return null;
+            }
             int[] id = { add.Entity.AudienceId };
             var res = await GetAudience(id);
             return res.FirstOrDefault();
 
         }
+
+        public async Task<AudienceGetDTO> PatchAudience(AudienceGetDTO audiencePatchDTO)
+        {
+            
+            var update = _context.Audience.FirstOrDefault(x => x.AudienceId == audiencePatchDTO.AudienceId);
+            if(update == null)
+            {
+                return audiencePatchDTO;
+            }
+            update.Age = audiencePatchDTO.Age;
+            update.Sex = audiencePatchDTO.Sex;
+
+            await _context.SaveChangesAsync();
+            int[] id = { audiencePatchDTO.AudienceId };
+            var res = await GetAudience(id);
+            return res.FirstOrDefault();
+
+        }
+
+        public async Task<bool> DeleteAudience(int id)
+        {
+
+
+            Audience? audience = await _context.Audience.FirstOrDefaultAsync(ap => ap.AudienceId == id);
+            if (audience == null)
+            {
+                return false;
+            }
+            var res = _context.Audience.Remove(audience);
+
+            if (res.Entity == null)
+            {
+                return false;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return true;
+
+        }
+
     }
 }

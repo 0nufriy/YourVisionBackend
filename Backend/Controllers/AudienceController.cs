@@ -107,6 +107,24 @@ namespace Backend.Controllers
             }
             return Ok(res);
         }
+        [HttpPatch]
+        [Route("Audience/udpate")]
+        public async Task<ActionResult<List<AudienceGetDTO>>> PatchAudience(AudienceGetDTO audiencePostDTO)
+        {
+            AudienceGetDTO res = await service.PatchAudience(audiencePostDTO);
+            if (res == null)
+            {
+                return NotFound();
+            }
+            return Ok(res);
+        }
+        [HttpDelete]
+        [Route("Audience/delete/{id}")]
+        public async Task<ActionResult<List<AudienceGetDTO>>> PostAudience(int id)
+        {
+            bool res = await service.DeleteAudience(id);
+            return Ok(res);
+        }
 
     }
 }
