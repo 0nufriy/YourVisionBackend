@@ -1,4 +1,5 @@
 ﻿using Backend.Core.Interfaces;
+using Backend.Core.Metods;
 using Backend.Core.Models;
 using Backend.Infrastructure.Data;
 using Backend.Infrastructure.Models;
@@ -15,20 +16,7 @@ namespace Backend.Core.Services
     public class ProfileService : IProfileService
     {
 
-        public static string HashPassword(string password)
-        {
-            MD5 md5 = MD5.Create();
-
-            byte[] b = Encoding.ASCII.GetBytes(password);
-            byte[] hash = md5.ComputeHash(b);
-
-            StringBuilder sb = new StringBuilder();
-            foreach (byte a in hash)
-            {
-                sb.Append(a.ToString("X2"));
-            }
-            return sb.ToString();
-        }
+       
 
 
         private ApplicationContext _context;
@@ -98,7 +86,7 @@ namespace Backend.Core.Services
             {
                 return null;
             }
-            if (a.password == HashPassword(loginDTO.password)){
+            if (a.password == HashPassword.Hash(loginDTO.password)){
                 return await _context.Profile
                     .Select(x => new ProfileGetDTO { Email = x.Email, Login = x.Login, Name = x.Name, PhoneNumber = x.PhoneNumber, ProfileId = x.ProfileId, Role = x.Role })
                     .FirstOrDefaultAsync(x => x.Login == loginDTO.login);
@@ -112,7 +100,7 @@ namespace Backend.Core.Services
             toAdd.Name = profilePostDTO.Name;
             toAdd.Login = profilePostDTO.Login;
             toAdd.Role = profilePostDTO.Role;
-            toAdd.password = HashPassword(profilePostDTO.password);
+            toAdd.password = HashPassword.Hash(profilePostDTO.password);
             toAdd.Email = profilePostDTO.Email;
 
             var add = await _context.Profile.AddAsync(toAdd);
@@ -137,7 +125,7 @@ namespace Backend.Core.Services
             {
                 return null;
             }
-            if (a.password == HashPassword(oldPassword))
+            if (a.password == HashPassword.Hash(oldPassword))
             {
 
                 var toUp = await _context.Profile.FirstOrDefaultAsync(y => y.Login == login);
@@ -145,7 +133,7 @@ namespace Backend.Core.Services
                 {
                     return null;
                 }
-                toUp.password = HashPassword(newPassword);
+                toUp.password = HashPassword.Hash(newPassword);
 
                 await _context.SaveChangesAsync();
 
