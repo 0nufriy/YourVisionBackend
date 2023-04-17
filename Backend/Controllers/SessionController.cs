@@ -1,16 +1,22 @@
 ﻿using Backend.Core.Interfaces;
 using Backend.Core.Models;
 using Backend.Infrastructure.Models;
+using Backend.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
+using OfficeOpenXml.ConditionalFormatting;
 using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Drawing.Chart.Style;
 using OfficeOpenXml.Style;
+using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.Numerics;
 using System.Runtime.Intrinsics.X86;
+using System.Security.Claims;
 
 namespace Backend.Controllers
 {
@@ -24,26 +30,38 @@ namespace Backend.Controllers
         {
             serviceSession = sessionService;
         }
-       
+
+        [Authorize]
         [HttpGet]
-        [Route("report/get/{id}")]
-        public async Task<ActionResult<ReportGetDTO>> ReportGet(int id)
+        [Route("report/get/{sessionid}")]
+        public async Task<ActionResult<ReportGetDTO>> ReportGet(int sessionid)
         {
-            ReportGetDTO res = await serviceSession.ReportGet(id);
+            ReportGetDTO res = await serviceSession.ReportGet(sessionid);
+            
             if (res == null)
+            {
+                return NotFound();
+            }
+            var user = GetCurrentUser();
+            if(user.Role != "admin" && user.ProfileId != res.UserId)
             {
                 return NotFound();
             }
             return Ok(res);
         }
 
-
+        [Authorize]
         [HttpGet]
-        [Route("report/download/{id}")]
-        public async Task<ActionResult> ReportDownload(int id)
+        [Route("report/download/{sessionid}")]
+        public async Task<ActionResult> ReportDownload(int sessionid)
         {
-            ReportGetDTO res = await serviceSession.ReportGet(id);
+            ReportGetDTO res = await serviceSession.ReportGet(sessionid);
             if (res == null)
+            {
+                return NotFound();
+            }
+            var user = GetCurrentUser();
+            if (user.Role != "admin" && user.ProfileId != res.UserId)
             {
                 return NotFound();
             }
@@ -55,10 +73,10 @@ namespace Backend.Controllers
 
 
         [NonAction]
-        public async Task<byte[]> MakeReport(int id)
+        public async Task<byte[]> MakeReport(int sessionid)
         {
 
-            ReportAllData session = await serviceSession.ReportAllData(id);
+            ReportAllData session = await serviceSession.ReportAllData(sessionid);
             
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             var package = new ExcelPackage();
@@ -313,24 +331,67 @@ namespace Backend.Controllers
             return package.GetAsByteArray();
         }
 
-        [HttpPost]
-        [Route("report/post/{id}")]
-        public async Task<ActionResult<ReportGetDTO>> ReportPost(int id)
+
+        
+      
+
+        [Authorize(Roles = "user")]
+        [HttpGet]
+        [Route("get/user/{id}")]
+        public async Task<ActionResult<SessionGetDTO>> GetSesionUser(int id)
         {
-            ReportGetDTO res = await serviceSession.ReportPost(id);
-            
+            var user = GetCurrentUser();
+            List<SessionGetDTO> list = await serviceSession.SessionGetByProfile(user.ProfileId);
+            SessionGetDTO res = await serviceSession.SessionGetById(id);
             if (res == null)
             {
                 return NotFound();
             }
-            var report = MakeReport(id);
-
-            System.IO.File.WriteAllBytes($"report/{id}.xlsx", report.Result);
-
+            if (!list.Contains(res))
+            {
+                return NotFound();
+            }
             return Ok(res);
         }
 
+        [Authorize(Roles = "user")]
+        [HttpGet]
+        [Route("get/byProfile/")]
+        public async Task<ActionResult<List<SessionGetDTO>>> SesionsGetbyProfile()
+        {
+            var user = GetCurrentUser();
+            List<SessionGetDTO> res = await serviceSession.SessionGetByProfile(user.ProfileId);
+            if (res == null)
+            {
+                return NotFound();
+            }
+            return Ok(res);
+        }
 
+        [Authorize(Roles = "user")]
+        [HttpPost]
+        [Route("add")]
+        public async Task<ActionResult<SessionGetDTO>> Post(SessionPost Post)
+        {
+            var userFromJwt = GetCurrentUser();
+            SessionPostDTO DTO = new SessionPostDTO()
+            {
+                Datetime = Post.Datetime,
+                Audiences = Post.Audiences,
+                DurationMinute = Post.DurationMinute,
+                Location = Post.Location,
+                ProfileId = userFromJwt.ProfileId,
+                Status = Post.Status,
+            };
+            SessionGetDTO? res = await serviceSession.SessionPost(DTO);
+            if (res == null)
+            {
+                return NotFound();
+            }
+            return Ok(res);
+        }
+
+        [Authorize(Roles = "admin")]
         [HttpGet]
         [Route("get/byProfile/{id}")]
         public async Task<ActionResult<List<SessionGetDTO>>> SesionsGetbyProfile(int id)
@@ -342,6 +403,9 @@ namespace Backend.Controllers
             }
             return Ok(res);
         }
+
+
+        [Authorize(Roles = "admin")]
         [HttpGet]
         [Route("get/{id}")]
         public async Task<ActionResult<SessionGetDTO>> SesionsGetbyId(int id)
@@ -351,9 +415,13 @@ namespace Backend.Controllers
             {
                 return NotFound();
             }
+
             return Ok(res);
         }
 
+
+       
+        [Authorize(Roles = "admin")]
         [HttpGet]
         [Route("get")]
         public async Task<ActionResult<List<SessionGetDTO>>> SesionsGet()
@@ -365,6 +433,10 @@ namespace Backend.Controllers
             }
             return Ok(res);
         }
+
+
+        [Authorize(Roles = "admin")]
+        [Authorize]
         [HttpDelete]
         [Route("delete/{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
@@ -373,19 +445,27 @@ namespace Backend.Controllers
 
             return Ok(res);
         }
-
+     
+        
+        [Authorize(Roles = "admin")]
         [HttpPost]
-        [Route("add")]
-        public async Task<ActionResult<SessionGetDTO>> Post(SessionPostDTO Post)
+        [Route("report/post/{id}")]
+        public async Task<ActionResult<ReportGetDTO>> ReportPost(int id)
         {
-            SessionGetDTO? res = await serviceSession.SessionPost(Post);
+            ReportGetDTO res = await serviceSession.ReportPost(id);
+
             if (res == null)
             {
                 return NotFound();
             }
+            var report = MakeReport(id);
+
+            System.IO.File.WriteAllBytes($"report/{id}.xlsx", report.Result);
+
             return Ok(res);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPatch]
         [Route("update")]
         public async Task<ActionResult<SessionGetDTO>> Patch(SessionPatchDTO Patch)
@@ -396,6 +476,25 @@ namespace Backend.Controllers
                 return NotFound();
             }
             return Ok(res);
+        }
+
+        [NonAction]
+        private UserFromJWT? GetCurrentUser()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+            if (identity is not null)
+            {
+                var userClaims = identity.Claims;
+
+                return new UserFromJWT
+                {
+                    Login = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.GivenName)?.Value, 
+                    ProfileId = Convert.ToInt32(userClaims.FirstOrDefault( o => o.Type == ClaimTypes.Sid)?.Value),
+                    Role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role)?.Value
+                };
+            }
+            return null;
         }
     }
 }

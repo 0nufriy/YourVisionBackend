@@ -11,5 +11,6 @@ namespace Backend.Core.Models
         public int ReportId { get; set; }
         public string ReportPath { get; set; }
         public int SessionId { get; set; }
+        public int? UserId { get; set; }
     }
 }

@@ -1,20 +1,25 @@
 ﻿using Backend.Core.Interfaces;
 using Backend.Core.Models;
 using Backend.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
 {
+    
     [Route("api/AudiencePack")]
     [ApiController]
     public class AudienceController : ControllerBase
     {
         private readonly IAudienceService service;
+
         public AudienceController(IAudienceService audienceService) {
             service = audienceService;
         }
 
+
+        [Authorize(Roles = "admin")]
         [HttpDelete]
         [Route("delete/{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
@@ -24,6 +29,8 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
+
+        [Authorize]
         [HttpGet]
         [Route("get")]
         public async Task<ActionResult<List<AudiencePackGetDTO>>> Get()
@@ -36,6 +43,7 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
+        [Authorize]
         [HttpGet]
         [Route("get/{id}")]
         public async Task<ActionResult<AudiencePackGetDTO>> Get(int id)
@@ -48,6 +56,7 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         [Route("add")]
         public async Task<ActionResult<AudiencePackGetDTO>> Post(AudiencePackPostDTO audiencePackPost)
@@ -60,6 +69,7 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPatch]
         [Route("update")]
         public async Task<ActionResult<AudiencePackGetDTO>> Patch(AudiencePackPatchDTO audiencePackPatch)
@@ -72,7 +82,7 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
-
+        [Authorize]
         [HttpGet]
         [Route("Audience/get")]
         public async Task<ActionResult<List<AudienceGetDTO>>> GetAudience()
@@ -84,6 +94,8 @@ namespace Backend.Controllers
             }
             return Ok(res);
         }
+
+        [Authorize]
         [HttpGet]
         [Route("Audience/get/ids")]
         public async Task<ActionResult<List<AudienceGetDTO>>> GetAudience([FromQuery(Name = "id")] int[] ids)
@@ -96,6 +108,7 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         [Route("Audience/post")]
         public async Task<ActionResult<List<AudienceGetDTO>>> PostAudience(AudiencePostDTO audiencePostDTO)
@@ -107,6 +120,7 @@ namespace Backend.Controllers
             }
             return Ok(res);
         }
+        [Authorize(Roles = "admin")]
         [HttpPatch]
         [Route("Audience/udpate")]
         public async Task<ActionResult<List<AudienceGetDTO>>> PatchAudience(AudienceGetDTO audiencePostDTO)
@@ -118,6 +132,7 @@ namespace Backend.Controllers
             }
             return Ok(res);
         }
+        [Authorize(Roles = "admin")]
         [HttpDelete]
         [Route("Audience/delete/{id}")]
         public async Task<ActionResult<List<AudienceGetDTO>>> PostAudience(int id)

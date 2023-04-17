@@ -1,5 +1,6 @@
 ﻿using Backend.Core.Interfaces;
 using Backend.Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -15,6 +16,7 @@ namespace Backend.Controllers
             service = emotionalService;
         }
 
+        [Authorize]
         [HttpGet]
         [Route("getEmotional/{id}")]
         public async Task<ActionResult<EmotionalGetDTO>> EmotionalGet(int id)
@@ -27,6 +29,7 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
+        [Authorize]
         [HttpPost]
         [Route("Result/post")]
         public async Task<ActionResult<EmotionalRDGetDTO>> ResultPost(EmotionalResultPostDTO postDTO)
@@ -39,6 +42,7 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
+        [Authorize]
         [HttpPost]
         [Route("Expect/post")]
         public async Task<ActionResult<EmotionalEDGetDTO>> ExpectPost(EmotionalExpectPostDTO postDTO)

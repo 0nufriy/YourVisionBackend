@@ -25,6 +25,49 @@ namespace Backend.Core.Services
             _context = context;
         }
 
+        public async Task<LoginDTO> Login(ProfileLoginDTO loginDTO)
+        {
+            var a = await _context.Profile.FirstOrDefaultAsync(x => x.Login == loginDTO.login);
+            if (a == null)
+            {
+                return null;
+            }
+            if (a.password == HashPassword.Hash(loginDTO.password))
+            {
+                return await _context.Profile
+                    .Select(x => new LoginDTO { Email = x.Email, Login = x.Login, Name = x.Name, PhoneNumber = x.PhoneNumber, ProfileId = x.ProfileId, Role = x.Role })
+                    .FirstOrDefaultAsync(x => x.Login == loginDTO.login);
+            }
+            return null;
+        }
+        public async Task<LoginDTO> Registration(ProfilePostDTO profilePostDTO)
+        {
+            Profile toAdd = new Profile();
+            toAdd.PhoneNumber = profilePostDTO.PhoneNumber;
+            toAdd.Name = profilePostDTO.Name;
+            toAdd.Login = profilePostDTO.Login;
+            toAdd.Role = profilePostDTO.Role;
+            toAdd.password = HashPassword.Hash(profilePostDTO.password);
+            toAdd.Email = profilePostDTO.Email;
+
+            var add = await _context.Profile.AddAsync(toAdd);
+            if (add.Entity == null)
+            {
+                return null;
+            }
+            await _context.SaveChangesAsync();
+            var res = await Login(new ProfileLoginDTO { login = profilePostDTO.Login, password = profilePostDTO.password });
+            if (res == null)
+            {
+                return null;
+            }
+
+            return res;
+        }
+
+
+
+
         public async Task<ProfileGetDTO> GetProfile(int id)
         {
             ProfileGetDTO? res = await _context.Profile
@@ -79,45 +122,7 @@ namespace Backend.Core.Services
                 .FirstOrDefaultAsync(x => x.ProfileId == profilePatchDTO.ProfileId);
             return res;
         }
-        public async Task<ProfileGetDTO> Login(ProfileLoginDTO loginDTO)
-        {
-            var a = await _context.Profile.FirstOrDefaultAsync(x => x.Login == loginDTO.login);
-            if(a == null)
-            {
-                return null;
-            }
-            if (a.password == HashPassword.Hash(loginDTO.password)){
-                return await _context.Profile
-                    .Select(x => new ProfileGetDTO { Email = x.Email, Login = x.Login, Name = x.Name, PhoneNumber = x.PhoneNumber, ProfileId = x.ProfileId, Role = x.Role })
-                    .FirstOrDefaultAsync(x => x.Login == loginDTO.login);
-            }
-            return null;
-        }
-        public async Task<ProfileGetDTO> Registration(ProfilePostDTO profilePostDTO)
-        {
-            Profile toAdd = new Profile();
-            toAdd.PhoneNumber = profilePostDTO.PhoneNumber;
-            toAdd.Name = profilePostDTO.Name;
-            toAdd.Login = profilePostDTO.Login;
-            toAdd.Role = profilePostDTO.Role;
-            toAdd.password = HashPassword.Hash(profilePostDTO.password);
-            toAdd.Email = profilePostDTO.Email;
-
-            var add = await _context.Profile.AddAsync(toAdd);
-            if(add.Entity == null)
-            {
-                return null;
-            }
-            await _context.SaveChangesAsync();
-            var res = await GetProfile(add.Entity.ProfileId);
-            if(res == null)
-            {
-                return null;
-            }
-            
-            return res;
-        }
-
+       
         public async Task<ProfileGetDTO> ProfileChangePasswort(string login, string oldPassword, string newPassword)
         {
             var a = await _context.Profile.FirstOrDefaultAsync(x => x.Login == login);

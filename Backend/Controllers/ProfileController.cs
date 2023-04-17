@@ -1,5 +1,6 @@
 ﻿using Backend.Core.Interfaces;
 using Backend.Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -16,6 +17,7 @@ namespace Backend.Controllers
 
 
 
+        [Authorize(Roles = "admin")]
         [HttpGet]
         [Route("get")]
         public async Task<ActionResult<List<ProfileGetDTO>>> Get()
@@ -28,6 +30,7 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
+        [Authorize]
         [HttpGet]
         [Route("get/{id}")]
         public async Task<ActionResult<ProfileGetDTO>> Get(int id)
@@ -39,6 +42,7 @@ namespace Backend.Controllers
             }
             return Ok(res);
         }
+        [Authorize]
         [HttpDelete]
         [Route("delete/{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
@@ -50,7 +54,7 @@ namespace Backend.Controllers
             }
             return Ok(res);
         }
-
+        [Authorize]
         [HttpPatch]
         [Route("patch")]
         public async Task<ActionResult<ProfileGetDTO>> Patch(ProfilePatchDTO profilePatchDTO)
@@ -63,29 +67,7 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
-        [HttpPost]
-        [Route("register")]
-        public async Task<ActionResult<ProfileGetDTO>> Register(ProfilePostDTO profilePostDTO)
-        {
-            ProfileGetDTO res = await service.Registration(profilePostDTO);
-            if (res == null)
-            {
-                return NotFound();
-            }
-            return Ok(res);
-        }
-
-        [HttpPost]
-        [Route("login")]
-        public async Task<ActionResult<ProfileGetDTO>> Login(ProfileLoginDTO loginDTO)
-        {
-            ProfileGetDTO res = await service.Login(loginDTO);
-            if (res == null)
-            {
-                return NotFound();
-            }
-            return Ok(res);
-        }
+        [Authorize]
         [HttpPatch]
         [Route("patch/password")]
         public async Task<ActionResult<ProfileGetDTO>> PatchPassword(string login, string oldPassword, string newPassword)

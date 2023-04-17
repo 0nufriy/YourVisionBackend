@@ -61,8 +61,8 @@ namespace Backend.Core.Services
 
         public async Task<ReportGetDTO> ReportGet(int sessionId)
         {
-            ReportGetDTO? reportGetDTO = await _context.Report
-                .Select(x => new ReportGetDTO { SessionId = x.SessionId, ReportId = x.ReportId, ReportPath = x.ReportPath})
+            ReportGetDTO? reportGetDTO = await _context.Report.Include(x => x.Session)
+                .Select(x => new ReportGetDTO { SessionId = x.SessionId, ReportId = x.ReportId, ReportPath = x.ReportPath, UserId = x.Session.ProfileId})
                 .FirstOrDefaultAsync(x => x.SessionId == sessionId);
             return reportGetDTO;
         }

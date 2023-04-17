@@ -9,8 +9,8 @@ namespace Backend.Core.Interfaces
 {
     public interface IProfileService
     {
-        Task<ProfileGetDTO> Registration(ProfilePostDTO profilePostDTO);
-        Task<ProfileGetDTO> Login(ProfileLoginDTO loginDTO);
+        Task<LoginDTO> Registration(ProfilePostDTO profilePostDTO);
+        Task<LoginDTO> Login(ProfileLoginDTO loginDTO);
         Task<ProfileGetDTO> ProfilePatch(ProfilePatchDTO profilePatchDTO);
         Task<ProfileGetDTO> ProfileChangePasswort(string login, string oldPassword, string newPassword);
         Task<bool> ProfileDelete(int id);
