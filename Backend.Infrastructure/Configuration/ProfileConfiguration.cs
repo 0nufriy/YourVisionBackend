@@ -30,7 +30,7 @@ namespace Backend.Infrastructure.Models
                 .Property(t => t.Login)
                 .IsRequired()
                 .HasColumnName("Login")
-                .HasColumnType("nvarchar(max)");
+                .HasColumnType("nvarchar(256)");
             builder
                 .Property(t => t.password)
                 .IsRequired()
@@ -40,12 +40,12 @@ namespace Backend.Infrastructure.Models
                 .Property(t => t.Email)
                 .IsRequired()
                 .HasColumnName("Email")
-                .HasColumnType("nvarchar(max)");
+                .HasColumnType("nvarchar(256)");
             builder
                 .Property(t => t.PhoneNumber)
                 .IsRequired()
                 .HasColumnName("PhoneNumber")
-                .HasColumnType("nvarchar(max)");
+                .HasColumnType("nvarchar(256)");
             builder
                 .Property(t => t.Role)
                 .IsRequired()

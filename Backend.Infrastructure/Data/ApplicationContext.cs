@@ -40,6 +40,15 @@ namespace Backend.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new SessionConfiguration());
             modelBuilder.ApplyConfiguration(new ASConfiguration());
 
+            modelBuilder.Entity<Profile>()
+               .HasKey(p => p.ProfileId);
+            modelBuilder.Entity<Profile>()
+                .HasIndex(p => p.Email).IsUnique();
+            modelBuilder.Entity<Profile>()
+               .HasIndex(p => p.Login).IsUnique();
+            modelBuilder.Entity<Profile>()
+               .HasIndex(p => p.PhoneNumber).IsUnique();
+
             modelBuilder.Entity<AAP>()
                 .HasOne(aap => aap.Audience)
                 .WithMany(a => a.AAPs)
