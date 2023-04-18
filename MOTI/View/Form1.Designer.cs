@@ -39,6 +39,13 @@
             AudienceNeed = new ListBox();
             button10 = new Button();
             button11 = new Button();
+            label1 = new Label();
+            label2 = new Label();
+            label3 = new Label();
+            label4 = new Label();
+            AudiencePackNeed = new ListBox();
+            button2 = new Button();
+            button3 = new Button();
             SuspendLayout();
             // 
             // button1
@@ -49,6 +56,7 @@
             button1.TabIndex = 0;
             button1.Text = "Додати набір";
             button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // button4
             // 
@@ -147,11 +155,83 @@
             button11.UseVisualStyleBackColor = true;
             button11.Click += button11_Click;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(54, 98);
+            label1.Name = "label1";
+            label1.Size = new Size(106, 15);
+            label1.TabIndex = 14;
+            label1.Text = "Набір фокус-груп";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(361, 98);
+            label2.Name = "label2";
+            label2.Size = new Size(137, 15);
+            label2.TabIndex = 15;
+            label2.Text = "Необхідно фокус групи";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(655, 98);
+            label3.Name = "label3";
+            label3.Size = new Size(77, 15);
+            label3.TabIndex = 16;
+            label3.Text = "Фокус-група";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(361, 346);
+            label4.Name = "label4";
+            label4.Size = new Size(106, 15);
+            label4.TabIndex = 18;
+            label4.Text = "Набір фокус-груп";
+            // 
+            // AudiencePackNeed
+            // 
+            AudiencePackNeed.FormattingEnabled = true;
+            AudiencePackNeed.ItemHeight = 15;
+            AudiencePackNeed.Location = new Point(361, 364);
+            AudiencePackNeed.Name = "AudiencePackNeed";
+            AudiencePackNeed.Size = new Size(235, 169);
+            AudiencePackNeed.TabIndex = 17;
+            // 
+            // button2
+            // 
+            button2.Location = new Point(602, 428);
+            button2.Name = "button2";
+            button2.Size = new Size(92, 49);
+            button2.TabIndex = 19;
+            button2.Text = "Згенерувати";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
+            // 
+            // button3
+            // 
+            button3.Location = new Point(602, 483);
+            button3.Name = "button3";
+            button3.Size = new Size(92, 49);
+            button3.TabIndex = 20;
+            button3.Text = "Подробиці про набір";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(984, 561);
+            Controls.Add(button3);
+            Controls.Add(button2);
+            Controls.Add(label4);
+            Controls.Add(AudiencePackNeed);
+            Controls.Add(label3);
+            Controls.Add(label2);
+            Controls.Add(label1);
             Controls.Add(button10);
             Controls.Add(button11);
             Controls.Add(AudienceNeed);
@@ -170,6 +250,7 @@
             Text = "Form1";
             Load += Form1_Load;
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -185,5 +266,12 @@
         private ListBox AudienceNeed;
         private Button button10;
         private Button button11;
+        private Label label1;
+        private Label label2;
+        private Label label3;
+        private Label label4;
+        private ListBox AudiencePackNeed;
+        private Button button2;
+        private Button button3;
     }
 }

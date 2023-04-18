@@ -39,6 +39,11 @@
             button1 = new Button();
             button4 = new Button();
             button5 = new Button();
+            comboBox1 = new ComboBox();
+            numericUpDown1 = new NumericUpDown();
+            label4 = new Label();
+            label5 = new Label();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             SuspendLayout();
             // 
             // label1
@@ -85,6 +90,7 @@
             button3.TabIndex = 5;
             button3.Text = "Видалити Набір";
             button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
             // 
             // button2
             // 
@@ -94,6 +100,7 @@
             button2.TabIndex = 4;
             button2.Text = "Зберегти Зміни";
             button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
             // 
             // textBox1
             // 
@@ -111,21 +118,23 @@
             // 
             // button1
             // 
-            button1.Location = new Point(311, 184);
+            button1.Location = new Point(323, 237);
             button1.Name = "button1";
             button1.Size = new Size(88, 49);
             button1.TabIndex = 9;
             button1.Text = "Додати фокус-групу";
             button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // button4
             // 
-            button4.Location = new Point(311, 239);
+            button4.Location = new Point(323, 292);
             button4.Name = "button4";
             button4.Size = new Size(88, 49);
             button4.TabIndex = 10;
             button4.Text = "Видалити фокус-групу";
             button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click;
             // 
             // button5
             // 
@@ -137,11 +146,50 @@
             button5.UseVisualStyleBackColor = true;
             button5.Click += button5_Click;
             // 
+            // comboBox1
+            // 
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Location = new Point(311, 161);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(112, 23);
+            comboBox1.TabIndex = 12;
+            // 
+            // numericUpDown1
+            // 
+            numericUpDown1.Location = new Point(311, 208);
+            numericUpDown1.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numericUpDown1.Name = "numericUpDown1";
+            numericUpDown1.Size = new Size(112, 23);
+            numericUpDown1.TabIndex = 13;
+            numericUpDown1.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(311, 143);
+            label4.Name = "label4";
+            label4.Size = new Size(80, 15);
+            label4.TabIndex = 14;
+            label4.Text = "Фокус-група:";
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(311, 190);
+            label5.Name = "label5";
+            label5.Size = new Size(53, 15);
+            label5.TabIndex = 15;
+            label5.Text = "Кілкість:";
+            // 
             // SelectAudiencePack
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(423, 475);
+            ClientSize = new Size(432, 475);
+            Controls.Add(label5);
+            Controls.Add(label4);
+            Controls.Add(numericUpDown1);
+            Controls.Add(comboBox1);
             Controls.Add(button5);
             Controls.Add(button4);
             Controls.Add(button1);
@@ -154,7 +202,9 @@
             Controls.Add(label2);
             Controls.Add(label1);
             Name = "SelectAudiencePack";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "SelectAidoencePack";
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -172,5 +222,9 @@
         private Button button1;
         private Button button4;
         private Button button5;
+        private ComboBox comboBox1;
+        private NumericUpDown numericUpDown1;
+        private Label label4;
+        private Label label5;
     }
 }
