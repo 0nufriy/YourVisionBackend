@@ -376,3 +376,12 @@ FodyWeavers.xsd
 /MOTI/Program.cs
 /MOTI/appsettings.json
 /MOTI/appsettings.Development.json
+/MOTI/Model/AudiencePackNeed.cs
+/MOTI/Model/AudienceNeed.cs
+/MOTI/View/Form1.cs
+/MOTI/View/AudiencePack/SelectAudiencePack.cs
+/MOTI/View/AudiencePack/AddAudiencePack.cs
+/MOTI/View/Audience/SelectAudience.cs
+/MOTI/View/Audience/EditNeedAudience.cs
+/MOTI/View/Audience/EditAudience.cs
+/MOTI/View/Audience/AddAudience.cs
