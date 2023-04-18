@@ -44,6 +44,7 @@ namespace Backend.Core.Services
             var audiencePack = 
                 await _context.AudiencePack
                 .Include(ap => ap.AAPs)
+                .ThenInclude(aap => aap.Audience)
                 .FirstOrDefaultAsync(ap => ap.AudiencePackId == id);
             if (audiencePack == null)
             {
@@ -55,14 +56,21 @@ namespace Backend.Core.Services
             res.AudiencePackId = audiencePack.AudiencePackId;
             res.AudiencePackName = audiencePack.AudiencePackName;
             res.Price = audiencePack.Price;
-            res.Audiences = audiencePack.AAPs.Where(x => x.AudiencePackId == id).Select(x => new AAPDTO{ AudienceId = x.AudienceId, AudienceCount = x.AudienceCount }).ToList();
+            res.Audiences = audiencePack.AAPs.Where(x => x.AudiencePackId == id)
+                .Select(x => new AAPDTO
+            { 
+                AudienceId = x.AudienceId, 
+                AudienceCount = x.AudienceCount, 
+                AudienceAge = x.Audience.Age, 
+                AudienceSex = x.Audience.Sex 
+            }).ToList();
             return res;
 
         }
 
         public async Task<List<AudiencePackGetDTO>> GetAudiencePack()
         {
-            var audiencePacks = await _context.AudiencePack.Include(ap=> ap.AAPs).ToListAsync();
+            var audiencePacks = await _context.AudiencePack.Include(ap=> ap.AAPs).ThenInclude(x => x.Audience).ToListAsync();
             List<AudiencePackGetDTO> res = new List<AudiencePackGetDTO>();
             foreach(var audiencePack in audiencePacks)
             {
@@ -71,7 +79,13 @@ namespace Backend.Core.Services
                     AudiencePackId = audiencePack.AudiencePackId,
                     AudiencePackName = audiencePack.AudiencePackName,
                     Price = audiencePack.Price,
-                    Audiences = audiencePack.AAPs.Where(x => x.AudiencePackId == audiencePack.AudiencePackId).Select(x => new AAPDTO { AudienceId = x.AudienceId, AudienceCount = x.AudienceCount }).ToList()
+                    Audiences = audiencePack.AAPs.Where(x => x.AudiencePackId == audiencePack.AudiencePackId)
+                    .Select(x => new AAPDTO { 
+                        AudienceId = x.AudienceId,
+                        AudienceCount = x.AudienceCount,
+                        AudienceAge = x.Audience.Age,
+                        AudienceSex = x.Audience.Sex
+                    }).ToList()
                 });
                 
             }

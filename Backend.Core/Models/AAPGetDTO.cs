@@ -12,6 +12,8 @@ namespace Backend.Core.Models
 
         public int AudienceId { get; set; }
         public int AudienceCount { get; set; }
+        public int AudienceAge { get; set; }
+        public bool AudienceSex { get; set; }
 
     }
 }
