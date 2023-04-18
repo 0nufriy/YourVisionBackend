@@ -366,3 +366,13 @@ FodyWeavers.xsd
 /Backend/report/2.xlsx
 /MOTI/MOTI.csproj
 /MOTI/MOTI.csproj
+/MOTI/Model/Audience/SelectAudience.cs
+/MOTI/Model/Audience/EditNeedAudience.cs
+/MOTI/Model/Audience/EditAudience.cs
+/MOTI/Model/Audience/AddAudience.cs
+/MOTI/Model/AudiencePack/SelectAudiencePack.cs
+/MOTI/Model/AudiencePack/AddAudiencePack.cs
+/MOTI/Model/Form1.cs
+/MOTI/Program.cs
+/MOTI/appsettings.json
+/MOTI/appsettings.Development.json
