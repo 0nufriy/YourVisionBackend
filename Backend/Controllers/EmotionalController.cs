@@ -22,7 +22,9 @@ namespace Backend.Controllers
             Eservice = emotionalService;
             Sservice = sessionService;
         }
-          [HttpPost]
+
+        [Authorize(Roles = "admin")]
+        [HttpPost]
         [Route("setConfig/{id}")]
         public async Task<ActionResult<bool>> puplishConfig(int id, PersonAudience[] list)
         {
@@ -60,6 +62,7 @@ namespace Backend.Controllers
             return Ok(true);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         [Route("startSession/{id}")]
         public async Task<ActionResult<bool>> startSession(int id)
@@ -112,9 +115,9 @@ namespace Backend.Controllers
 
                 var b = await mqttClient.SubscribeAsync(mqttSubscribeOptions);
 
-                Console.WriteLine("Update fridge temperature start.");
+                Console.WriteLine("Add emotional start.");
                 Console.ReadLine();
-                Console.WriteLine("Update fridge temperature stop.");
+                Console.WriteLine("Add emotional stop.");
             }
            
 
