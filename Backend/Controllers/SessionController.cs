@@ -334,9 +334,6 @@ namespace Backend.Controllers
         }
 
 
-        
-      
-
         [Authorize(Roles = "user")]
         [HttpGet]
         [Route("get/user/{id}")]

@@ -1,8 +1,12 @@
 ﻿using Backend.Core.Interfaces;
 using Backend.Core.Models;
 using Backend.Metods;
+using Backend.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MQTTnet;
+using MQTTnet.Client;
+using Newtonsoft.Json;
 
 namespace Backend.Controllers
 {
@@ -11,10 +15,110 @@ namespace Backend.Controllers
     public class EmotionalController : ControllerBase
     {
 
-        private readonly IEmotionService service;
-        public EmotionalController(IEmotionService emotionalService)
+        private readonly IEmotionService Eservice;
+        private readonly ISessionService Sservice;
+        public EmotionalController(IEmotionService emotionalService, ISessionService sessionService)
         {
-            service = emotionalService;
+            Eservice = emotionalService;
+            Sservice = sessionService;
+        }
+          [HttpPost]
+        [Route("setConfig/{id}")]
+        public async Task<ActionResult<bool>> puplishConfig(int id, PersonAudience[] list)
+        {
+            var session = await Sservice.SessionGetById(id);
+            if(session == null)
+            {
+                return NotFound();
+            }
+            var mqttFactory = new MqttFactory();
+            using (var mqttClient = mqttFactory.CreateMqttClient())
+            {
+
+                var mqttClientOptions = new MqttClientOptionsBuilder()
+                    .WithClientId("Onufriy_web_api")
+                    .WithTcpServer("7b26d5ab55b440aea791d3c891152fcf.s1.eu.hivemq.cloud")
+                    .WithCredentials("hivemq.webclient.1683143341233", "0A<m8*b9.tK&B5xXqHSh")
+                    .WithTls()
+                    .WithCleanSession()
+                    .Build();
+
+                var a = await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
+                foreach (var person in list)
+                {
+                    Config config = new Config();
+                    config.SessionId = id;
+                    config.AudienceID = person.AudienceId;
+                    config.DurationMinute = session.DurationMinute;
+                    var message = new MqttApplicationMessageBuilder()
+                    .WithTopic("config" + person.PersonId.ToString())
+                    .WithPayload(JsonConvert.SerializeObject(config))
+                    .Build();
+                    mqttClient.PublishAsync(message);
+                }
+            }
+            return Ok(true);
+        }
+
+        [HttpPost]
+        [Route("startSession/{id}")]
+        public async Task<ActionResult<bool>> startSession(int id)
+        {
+            var session = await Sservice.SessionGetById(id);
+            if(session == null)
+            {
+                return NotFound();
+            }
+            var mqttFactory = new MqttFactory();
+
+            var count_done = 0;
+            bool cont = true;
+            using (var mqttClient = mqttFactory.CreateMqttClient())
+            {
+
+                var mqttClientOptions = new MqttClientOptionsBuilder()
+                    .WithClientId("Onufriy_web_api")
+                    .WithTcpServer("7b26d5ab55b440aea791d3c891152fcf.s1.eu.hivemq.cloud")
+                    .WithCredentials("hivemq.webclient.1683143341233", "0A<m8*b9.tK&B5xXqHSh")
+                    .WithTls()
+                    .WithCleanSession()
+                    .Build();
+
+                var a = await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
+               
+                mqttClient.ApplicationMessageReceivedAsync += e =>
+                {
+                    var a = System.Text.Encoding.Default.GetString(e.ApplicationMessage.Payload);
+                    EmotionalResultPostDTO postDTO = Newtonsoft.Json.JsonConvert.DeserializeObject<EmotionalResultPostDTO>(a);
+
+                    try
+                    {
+                        ResultPost(postDTO);
+                    }
+                    catch
+                    {
+                        return Task.CompletedTask;
+                    }
+                    Console.WriteLine($"{postDTO.Start} to {postDTO.End} - emotional {postDTO.Emotional} from device {postDTO.PersonId}");
+                    return Task.CompletedTask;
+                };
+                var mqttSubscribeOptions = mqttFactory.CreateSubscribeOptionsBuilder()
+                    .WithTopicFilter(
+                        f =>
+                        {
+                            f.WithTopic("emotional");
+                        })
+                    .Build();
+
+                var b = await mqttClient.SubscribeAsync(mqttSubscribeOptions);
+
+                Console.WriteLine("Update fridge temperature start.");
+                Console.ReadLine();
+                Console.WriteLine("Update fridge temperature stop.");
+            }
+           
+
+            return Ok(true);
         }
 
         [Authorize]
@@ -23,7 +127,7 @@ namespace Backend.Controllers
         public async Task<ActionResult<EmotionalGetDTO>> EmotionalGet(int id)
         {
            
-            EmotionalGetDTO res = await service.GetEmotionals(id);
+            EmotionalGetDTO res = await Eservice.GetEmotionals(id);
             var user = CurrentUser.Get(HttpContext);
             if (user.Role != "admin" && user.ProfileId != res.ProfileId)
             {
@@ -36,12 +140,12 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
-        [Authorize]
+        [Authorize(Roles = "admin")]
         [HttpPost]
         [Route("Result/post")]
         public async Task<ActionResult<EmotionalRDGetDTO>> ResultPost(EmotionalResultPostDTO postDTO)
         {
-            EmotionalRDGetDTO res = await service.PostEmotionalResult(postDTO);
+            EmotionalRDGetDTO res = await Eservice.PostEmotionalResult(postDTO);
             if (res == null)
             {
                 return NotFound();
@@ -54,7 +158,7 @@ namespace Backend.Controllers
         [Route("Expect/post")]
         public async Task<ActionResult<EmotionalEDGetDTO>> ExpectPost(EmotionalExpectPostDTO postDTO)
         {
-            EmotionalEDGetDTO res = await service.PostEmotionalExpect(postDTO);
+            EmotionalEDGetDTO res = await Eservice.PostEmotionalExpect(postDTO);
             if (res == null)
             {
                 return NotFound();

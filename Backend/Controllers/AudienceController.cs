@@ -29,6 +29,17 @@ namespace Backend.Controllers
             return Ok(res);
         }
 
+        [HttpGet]
+        [Route("get/unavaibleDataTime")]
+        public async Task<ActionResult<List<string>>> GetAvaible([FromQuery(Name = "id")] int[] ids)
+        {
+            List<string> res = await service.GetUnavaibleDate(ids);
+            if (res == null)
+            {
+                return NotFound();
+            }
+            return Ok(res);
+        }
 
         [Authorize]
         [HttpGet]

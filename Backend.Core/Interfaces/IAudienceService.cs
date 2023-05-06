@@ -21,5 +21,6 @@ namespace Backend.Core.Interfaces
         Task<bool> DeleteAudience(int id);
         Task<AudienceGetDTO> PatchAudience(AudienceGetDTO audiencePatchDTO);
 
+        Task<List<string>> GetUnavaibleDate(int[] ids);
     }
 }

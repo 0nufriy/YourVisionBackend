@@ -213,5 +213,17 @@ namespace Backend.Core.Services
 
         }
 
+        public async Task<List<string>> GetUnavaibleDate(int[] ids)
+        {
+            List <int> sesion = _context.Session.Where(x => x.Status != "Result").Select(x => x.SessionId).ToList();
+
+            List<string> result =  _context.AudienceSession
+                .Include(x => x.Session)
+                .Where(x => ids.Contains(x.AudiencePackId) && sesion.Contains(x.SessionId))
+                .Select(x => x.Session.Datetime)
+                .ToList();
+
+            return result;
+        }
     }
 }
